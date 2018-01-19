@@ -1,0 +1,78 @@
+#ifndef MSONG_H
+#define MSONG_H
+
+#include <QObject>
+#include <QVector>
+#include <QList>
+#include <QMap>
+
+#include "mnota.h"
+#include "../core/xmlbasesong.h"
+
+class AbstractBackend;
+
+class MSong : public XmlBaseSong
+{
+    Q_OBJECT
+public:
+    explicit MSong(QObject *parent = 0);
+    ~MSong();
+    //MSong();
+    void set_pl(AbstractBackend* player);
+    int get_tempo();
+    int get_count_voice();
+    int get_dur();
+    bool getLooping();
+    void set_tempo(int new_tempo);
+
+
+    void create_next_part() {}
+    void create_end_part() {}
+
+    void create_next_missure(){}
+    void create_end_missure();
+
+    void create_add_nota(Snota nota);
+    void create_add_atr(Satr atr){
+        Q_UNUSED(atr);
+    }
+
+    void set_start();
+    void init();
+public slots:
+    void tick();
+    void stop_play();
+
+    void setTime(int time);
+    void setStartCi();
+    void setEndCi();
+    void setEnabledCi(bool enabled);
+signals:
+    void pl_nota_on();
+    void pl_nota_off();
+    void song_end();
+    void setSongForScroll(int dur, int* time, int* TstartCi, int* TendCi);
+    void updateScroll();
+
+
+private:
+    QMap<int, int> map;
+    int tempo;
+    int time;
+    int timeStartCi;
+    int timeEndCi;
+    int dur;
+    bool isLooping;
+//    Player* pl;
+
+    QVector<QVector<MNota*>> part_notes;
+    QVector<int> tek_notes;
+    AbstractBackend* ab;
+    void findNowNota(int time);
+    void playTekNotes();
+
+    void nota_on(MNota* nota, int channel);
+    void nota_off(MNota* nota, int channel);
+};
+
+#endif // MSONG_H
